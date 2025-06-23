@@ -1,0 +1,275 @@
+package com.ratings.review.entity;
+
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+/**
+ * Entity representing an agent's response to a review.
+ */
+@Entity
+@Table(name = "agent_responses")
+public class AgentResponse {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long responseId;
+
+    @ManyToOne
+    @JoinColumn(name = "review_id", nullable = false)
+    private Review review; // Links response to the review   
+
+
+    @Column(name = "agent_id", nullable = false)
+
+    private Long agentId; 
+
+ // Ensures only package owner responds
+
+    @Column(nullable = false, length = 500)
+    private String responseMessage;
+
+    @Column(nullable = false)
+    private LocalDateTime responseTime;
+
+    // Getters and Setters
+    public Long getResponseId() { return responseId; }
+    public void setResponseId(Long responseId) { this.responseId = responseId; }
+
+    public Review getReview() { return review; }
+    public void setReview(Review review) { this.review = review; }
+
+    public Long getAgentId() { return agentId; }
+    public void setAgentId(Long agentId) { this.agentId = agentId; }
+
+    public String getResponseMessage() { return responseMessage; }
+    public void setResponseMessage(String responseMessage) { 
+        if (responseMessage == null || responseMessage.isEmpty()) {
+            throw new IllegalArgumentException("Response message cannot be empty.");
+        }
+        this.responseMessage = responseMessage; 
+    }
+
+    public LocalDateTime getResponseTime() { return responseTime; }
+    public void setResponseTime(LocalDateTime responseTime) { this.responseTime = responseTime; }
+}
+
+package com.ratings.review.controller;
+
+import com.ratings.review.entity.AgentResponse;
+import com.ratings.review.exception.ResourceNotFoundException;
+import com.ratings.review.service.AgentResponseService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+
+/**
+ * Controller for handling agent responses to reviews.
+ */
+@RestController
+@RequestMapping("/api/agent-responses") //Base mapping
+public class AgentResponseController {
+    private static final Logger logger = LoggerFactory.getLogger(AgentResponseController.class);
+
+    @Autowired
+    private AgentResponseService agentResponseService;
+
+    /**
+     * Travel Agent Responds to a Review (Only if they own the package)
+     */
+    @PostMapping("/{agentId}/{reviewId}")
+    public ResponseEntity<Map<String, Object>> respondToReview(
+            @PathVariable Long agentId,
+            @PathVariable Long reviewId,
+            @RequestBody Map<String, String> requestBody) { //  Accept JSON body as a map
+
+        String responseMessage = requestBody.get("responseMessage"); // Extract message from JSON
+
+        //Call the service method correctly
+        AgentResponse savedResponse = agentResponseService.respondToReview(agentId, reviewId, responseMessage);
+
+        //Extract packageId and review comment for response
+        Long packageId = savedResponse.getReview().getPackageId();
+        String reviewMessage = savedResponse.getReview().getComment();
+
+        //Create response with required fields
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("packageId", packageId);
+        responseBody.put("reviewId", reviewId);
+        responseBody.put("reviewMessage", reviewMessage);
+        responseBody.put("responseMessage", savedResponse.getResponseMessage());
+        responseBody.put("responseTime", savedResponse.getResponseTime());
+
+        return ResponseEntity.ok(responseBody);
+    }
+
+    /**
+     * Get Responses for a Specific Review
+     */
+    @GetMapping("/{reviewId}")
+    public ResponseEntity<List<AgentResponse>> getResponsesForReview(@PathVariable Long reviewId) {
+        logger.info("Fetching responses for Review ID {}", reviewId);
+        List<AgentResponse> responses = agentResponseService.getResponsesForReview(reviewId);
+        return ResponseEntity.ok(responses);
+    }
+}
+
+package com.ratings.review.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.ratings.review.entity.AgentResponse;
+
+import java.util.List;
+
+/**
+ * Repository for managing agent responses to reviews.
+ */
+@Repository
+public interface AgentResponseRepository extends JpaRepository<AgentResponse, Long> {
+    /**
+     * Find all responses related to a specific review.
+     */
+    List<AgentResponse> findByReview_ReviewId(Long reviewId);
+}
+
+package com.ratings.review.service;
+
+import com.ratings.review.client.TravelPackageClient;
+import com.ratings.review.dto.TravelPackageDTO;
+import com.ratings.review.entity.AgentResponse;
+import com.ratings.review.entity.Review;
+import com.ratings.review.exception.ResourceNotFoundException;
+import com.ratings.review.repository.AgentResponseRepository;
+import com.ratings.review.repository.ReviewRepository;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+public class AgentResponseService {
+    private static final Logger logger = LoggerFactory.getLogger(AgentResponseService.class);
+
+    @Autowired
+    private AgentResponseRepository agentResponseRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
+
+    @Autowired
+    private TravelPackageClient travelPackageClient; // Feign client to communicate with Travel Package module
+
+    /**
+     * Allows a travel agent to respond to a review.
+     * Only the agent who owns the package can respond.
+     */
+    public AgentResponse respondToReview(Long agentId, Long reviewId, String responseMessage) {
+        logger.info("Attempting to respond to review ID: {}", reviewId);
+
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> {
+                    logger.error("Review ID {} not found.", reviewId);
+                    return new ResourceNotFoundException("Review not found.");
+                });
+
+        Long packageId = review.getPackageId();
+
+        // Fetch package details from Travel Package Management module
+        TravelPackageDTO travelPackage = travelPackageClient.getPackageById(packageId);
+
+        // Authorization check: Only package owner can respond
+        if (!travelPackage.getAgentId().equals(agentId)) {
+            logger.warn("Unauthorized response attempt by Agent ID {}", agentId);
+            throw new ResourceNotFoundException("Unauthorized: Only the package owner can respond.");
+        }
+
+        AgentResponse response = new AgentResponse();
+        response.setReview(review);
+        response.setAgentId(agentId);
+        response.setResponseMessage(responseMessage);
+        response.setResponseTime(LocalDateTime.now());
+
+        logger.info("Agent ID {} successfully responded to review ID {}", agentId, reviewId);
+        return agentResponseRepository.save(response);
+    }
+
+    /**
+     * Retrieves responses for a specific review.
+     */
+    public List<AgentResponse> getResponsesForReview(Long reviewId) {
+        logger.info("Fetching responses for review ID: {}", reviewId);
+        return agentResponseRepository.findByReview_ReviewId(reviewId);
+    }
+}
+
+package com.ratings.review.client;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import com.ratings.review.dto.TravelPackageDTO;
+
+/**
+ * Feign client interface for interacting with the Travel Package Management service.
+ * This client is used to retrieve travel package details and validate agent ownership.
+ */
+@FeignClient(name = "travel-package-management") // Connects to the travel package service using a configurable URL
+public interface TravelPackageClient {
+
+    /**
+     * Retrieves the details of a travel package by its ID.
+     *
+     * @param id the ID of the travel package
+     * @return a TravelPackageDTO containing package details
+     */
+//    @GetMapping("/api/packages/{id}") // Maps to the endpoint that returns package details
+//    TravelPackageDTO getPackageById(@PathVariable("id") Long id);
+
+    /**
+     * Retrieves the agent ID associated with a specific travel package.
+     * This method is used for validating whether a given agent owns the package.
+     *
+     * @param id the ID of the travel package
+     * @return the agent ID who owns the package
+     */
+    @GetMapping("/api/packages/{packageId}/agent") // Maps to the endpoint that returns the agent ID for a package
+    Long getAgentIdByPackage(@PathVariable("packageId") Long id);
+}package com.ratings.review.dto;
+
+import lombok.Data;
+
+@Data
+public class TravelPackageDTO {
+    private Long packageId;
+    private Long agentId;
+    private String title; 
+}
+
+
+spring.application.name=RatingsAndReview
+spring.datasource.url=jdbc:mysql://localhost:3306/reviewsdatabase
+spring.datasource.username=root
+spring.datasource.password=root
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+server.port=8084
+
+# Eureka client configuration
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+eureka.instance.prefer-ip-address=true
+
+
+
+
