@@ -40,6 +40,6 @@ already reviews packages reves are vsibsle to evyry custoerm who seeign that pac
 Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
 review-dashboard.component.ts:90 User 0 has NOT completed booking for package 7
 review-dashboard.component.ts:57 Reviews loaded: Array(0)length: 0[[Prototype]]: Array(0)
-
+i provided i with the review dashboard ocde and agent response backend code right now i want the agent response code i created agent dashbaord in that one button view reviews where when agent clicks that view buttons it shows sall revews related to that package given by the customer and the agent a=should respinds to that reviews that responses should be shown in the review dashbard in that under the particular review it should be shown i want this give front code end for it i done wth backend code and then i done review dashbaord now i want agent repsonse to tht review and the reviews hsould be displayed there belo review one button should be there to reposnds by the travel agent and that response should be shown in the revie dahsbaord under the particular review give it correctly port numbe is 8084 for reviews and agent responses module 
 
  
