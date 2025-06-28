@@ -37,6 +37,9 @@ You can only review this package after completing the booking.
 Please ensure you are logged in to submit or view reviews. User ID not found
 already reviews packages reves are vsibsle to evyry custoerm who seeign that package and then it should aks for review usign start c omponent and ratings for users who completed the reviews and travel agent should responds to that review..
 
+Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+review-dashboard.component.ts:90 User 0 has NOT completed booking for package 7
+review-dashboard.component.ts:57 Reviews loaded: Array(0)length: 0[[Prototype]]: Array(0)
 
 
  
