@@ -1,45 +1,21 @@
-# payment_booking_codes
-i have 5 modules in my travel package booking system project ,here my modules was ratings and reviews and agent responses modules ,i provides u with codes of both modules my question is if a customer wants to give review what conditions arises ,anyone cannot give reveiw right give the conditions..
-You're absolutely right—**not everyone should be allowed to leave a review** in a travel package booking system. To maintain authenticity and prevent spam or misuse, certain **conditions or rules** should be enforced before a customer can submit a review. Here are the **key conditions** that typically apply:
+Container Introduction, Container architecture, Overview of Docker, Docker architecture - Docker file, Working with containers, Container Communication, Docker Compose, open source; create, deploy and run applications in containers, package application, virtual machine, image, containerContainer Introduction, Container architecture, Overview of Docker, Docker architecture - Docker file, Working wit+C3h containers, Container Communication, Docker Compose, open source; create, deploy and run applications in containers, package application, virtual machine, image, container,docker-compose.yml, docker-compose up command, mapping MySQL data file to local folder, schema creation script execution definition, defining port, password definition, docker compose up, executing mysql client on the mysql server container,Defining Dockerfile for REST API, building Dockerfile from docker-compose.yml, using depends_on in docker compose to define dependencies, using links to establish connectivity between REST API service and MySQL server, modify connection properties in REST API to connect to the docker instance,Traditional IT Deployment, Virtualization, Service-Oriented Architecture (SOA), Cloud vs. On-Premises Data Centers, Pros and Cons of Cloud Computing,Infrastructure as a Service (IaaS), Platform as a Service (PaaS), Software as a Service (SaaS),Public Cloud Model, Private Cloud Model, Hybrid Cloud Model, Community Cloud Model,AWS, Azure, GCP,Benefits of Cloud Computing, Various Services Available in GCP: Compute, Storage, Database, App Engine, Kubernetes Engine (GKE), Cloud Functions,Overview of Cloud Computing, Introduction to GCP Services, Creating a GCP Account, GCP Global Infrastructure,Google Compute Engine: Launching and Configuring Instances, Machine Types and Customization, Firewall Rules and SSH Keys
 
----
+Google Kubernetes Engine (GKE): Cluster Setup and Management, Deploying and Managing Containers
 
-### ✅ **Conditions for Allowing a Customer to Submit a Review**
+Google App Engine: Standard and Flexible Environments, Deploying Applications
 
-1. **Completed Booking**
-   - The customer must have successfully booked and completed a travel package.
-   - This ensures that only genuine users who experienced the service can leave feedback.
+Google Cloud Functions: Creating and Deploying Functions, Integrating with Other GCP Services,Virtual Private Cloud (VPC): Subnets, Route Tables, and Firewall Rules, VPC Peering and Shared VPC
 
-2. **Booking Status: Completed or Delivered**
-   - The booking status should be marked as **"Completed"**, **"Travelled"**, or **"Delivered"** in the system.
-   - Reviews should not be allowed for cancelled or pending bookings.
+Cloud Load Balancing: HTTP(S) Load Balancer, Network Load Balancer, Internal Load Balancing
 
-3. **One Review per Booking**
-   - Each customer should be allowed to submit **only one review per booking** to avoid spam or manipulation.
+Cloud CDN (Content Delivery Network): Configuring CDN, Integrating with Load Balancers,Cloud SQL: Creating and Managing Database Instances, High Availability Configurations
 
-4. **User Authentication**
-   - The customer must be **logged in** to their account.
-   - Anonymous or guest users should not be allowed to post reviews.
+Cloud Spanner: Globally Distributed Databases, Scalability and Consistency
 
-5. **Time Limit (Optional)**
-   - Some systems allow reviews only within a certain time frame after the trip (e.g., within 30 days of completion).
+Cloud Firestore: NoSQL Document Databases, Creating and Querying Collections
 
-6. **No Prior Review for Same Package (Optional)**
-   - If the customer has already reviewed the same package in a previous booking, you might restrict or flag it.
+BigQuery: Data Warehousing, Running Queries and Analyzing Data,Users, Groups, and Roles, IAM Policies and Permissions, Multi-Factor Authentication (MFA), Service Accounts and Key Management,Google Cloud Functions: Creating and Deploying Functions, Event-Driven Integrations
 
-7. **Review Content Validation**
-   - The review text should be checked for:
-     - Minimum length (e.g., at least 20 characters)
-     - No offensive or inappropriate language
-     - Optional: Sentiment analysis or moderation
-gettign these otuputs with this codeTravel Package Reviews
-You can only review this package after completing the booking.
-Please ensure you are logged in to submit or view reviews. User ID not found
-already reviews packages reves are vsibsle to evyry custoerm who seeign that package and then it should aks for review usign start c omponent and ratings for users who completed the reviews and travel agent should responds to that review..
+Google Cloud Run: Deploying Containerized Applications, Managing Scalability and Traffic
 
-Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
-review-dashboard.component.ts:90 User 0 has NOT completed booking for package 7
-review-dashboard.component.ts:57 Reviews loaded: Array(0)length: 0[[Prototype]]: Array(0)
-i provided i with the review dashboard ocde and agent response backend code right now i want the agent response code i created agent dashbaord in that one button view reviews where when agent clicks that view buttons it shows sall revews related to that package given by the customer and the agent a=should respinds to that reviews that responses should be shown in the review dashbard in that under the particular review it should be shown i want this give front code end for it i done wth backend code and then i done review dashbaord now i want agent repsonse to tht review and the reviews hsould be displayed there belo review one button should be there to reposnds by the travel agent and that response should be shown in the revie dahsbaord under the particular review give it correctly port numbe is 8084 for reviews and agent responses module 
-
- 
+API Gateway: Creating and Managing APIs, Securing API Access,Overview of DevOps Practices, GCP Cloud Services for DevOps, Infrastructure as Code (IaC) with Terraform or Deployment Manager, Continuous Integration (CI), Continuous Deployment (CD)Introduction to Cloud Source Repositories, Setting Up Repositories, Basic Version Control with Git, Repository Workflows, Integration with Cloud Build and Cloud DeployIntroduction to Cloud Source Repositories, Setting Up Repositories, Basic Version Control with Git, Repository Workflows, Integration with Cloud Build and Cloud Deploy,Introduction to Cloud Build, Configuring Build Triggers and Projects, Build Configuration with cloudbuild.yaml, Managing Build Artifacts, Customizing Build Environments and Steps,Introduction to Cloud Deploy, Setting Up Deployment Pipelines, Defining Deployment Targets and Strategies, Managing Rollbacks and Revisions, Integrations with Cloud Build and Artifact Registry,Introduction to Cloud Build Pipelines, Creating and Managing Pipelines, Pipeline Execution and Artifact Management, Integrating Various GCP Services within Pipelines, Pipeline Monitoring and Troubleshooting
